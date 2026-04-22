@@ -5,3 +5,12 @@ services:
       context: .
       dockerfile: Dockerfile
     image: vouchers-app:prod
+    networks:
+      - proxy-network
+    labels:
+      - traefik.docker.network=proxy-network
+
+networks:
+  proxy-network:
+    external: true
+    name: proxy-network
