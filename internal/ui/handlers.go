@@ -74,7 +74,7 @@ func (u *UI) PostLogin(w http.ResponseWriter, r *http.Request) {
 		Path:     "/admin",
 		HttpOnly: true,
 		Secure:   u.o.CookieSecure,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode,
 		Expires:  time.Now().Add(8 * time.Hour),
 	})
 	u.o.Logger.Info("login ok", slog.String("ip", ip), slog.String("user", user))
