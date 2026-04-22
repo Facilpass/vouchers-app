@@ -1,0 +1,14 @@
+.git
+.github
+docs
+testdata
+*.md
+.env
+!.env.example
+.DS_Store
+*.swp
+coverage.out
+/vouchers
+/bin
+Dockerfile
+docker-compose*.yml
