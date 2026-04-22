@@ -1,0 +1,26 @@
+{{define "app"}}{{template "layout" .}}{{end}}
+{{define "content"}}<div class="upload-box">
+  <h1>Upload de voucher</h1>
+  <form id="upload-form" method="POST" action="/admin/upload" enctype="multipart/form-data">
+    <input type="hidden" name="csrf" value="{{.CSRF}}" />
+    <label>
+      Path
+      <input type="text" name="path" id="path" required
+             placeholder="tenant/evento/categoria (ex: loungebrahma/copa-do-brasil/camarote)" />
+      <small>Minúsculas, números e hífen. Até 10 níveis. Espaços e acentos são convertidos automaticamente.</small>
+    </label>
+    <div class="dropzone" id="dropzone">
+      <p>Arraste arquivos aqui ou clique</p>
+      <input type="file" name="files" id="files" multiple accept=".jpg,.jpeg,.png,.webp" hidden />
+      <p class="hint">JPEG, PNG, WebP · max 5 MB cada · convertido automaticamente pra WebP</p>
+    </div>
+    <ul id="queue"></ul>
+    <button type="submit" id="submit-btn" disabled>Enviar arquivos</button>
+  </form>
+  <div id="results" hidden>
+    <h2>Upload concluído</h2>
+    <div id="results-list"></div>
+    <button type="button" onclick="location.reload()">Novo upload</button>
+  </div>
+</div>
+<script src="/admin/static/app.js"></script>{{end}}

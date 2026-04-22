@@ -1,0 +1,15 @@
+{{define "login"}}{{template "layout" .}}{{end}}
+{{define "content"}}<div class="login-box">
+  <h1>Entrar</h1>
+  {{if .Error}}<div class="err">
+    {{if eq .Error "credenciais"}}Usuário ou senha inválidos.
+    {{else if eq .Error "bloqueado"}}IP bloqueado por 15 minutos (excedeu tentativas).
+    {{else}}Erro: {{.Error}}
+    {{end}}
+  </div>{{end}}
+  <form method="POST" action="/admin/login">
+    <label>Usuário <input type="text" name="user" required autofocus /></label>
+    <label>Senha <input type="password" name="pass" required /></label>
+    <button type="submit">Entrar</button>
+  </form>
+</div>{{end}}

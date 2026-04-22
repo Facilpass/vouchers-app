@@ -1,0 +1,19 @@
+{{define "layout"}}<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{.Title}} · vouchers.facilpass</title>
+  <link rel="stylesheet" href="/admin/static/app.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">vouchers.facilpass</div>
+    {{if .User}}<div class="user">{{.User}} · <a href="/admin/logout">sair</a></div>{{end}}
+  </header>
+  <main>
+    {{template "content" .}}
+  </main>
+  <footer>FacilPass · CDN de vouchers</footer>
+</body>
+</html>{{end}}
