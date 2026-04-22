@@ -1,0 +1,76 @@
+name: fp_vouchers-app
+networks:
+  proxy:
+    external: true
+    name: proxy
+services:
+  vouchers-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    cap_drop:
+      - ALL
+    container_name: vouchers-facilpass-staging
+    cpus: "0.5"
+    environment:
+      ADMIN_PASS_BCRYPT: ${ADMIN_PASS_BCRYPT}
+      ADMIN_USER: ${ADMIN_USER}
+      LISTEN_ADDR: :8080
+      MAX_UPLOAD_MB: "5"
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
+      SESSION_SECRET: ${SESSION_SECRET}
+      STORAGE_ROOT: /srv/vouchers
+      WEBP_QUALITY: "85"
+    healthcheck:
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      test:
+        - CMD-SHELL
+        - wget -qO- http://127.0.0.1:8080/healthz || exit 1
+      timeout: 5s
+    image: vouchers-app:staging
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.${ROUTER}-public.rule=Host(`${VOUCHERS_HOST}`) && !PathPrefix(`/admin`)
+      - traefik.http.routers.${ROUTER}-public.entrypoints=websecure
+      - traefik.http.routers.${ROUTER}-public.tls=true
+      - traefik.http.routers.${ROUTER}-public.tls.certresolver=${CERT_RESOLVER}
+      - traefik.http.routers.${ROUTER}-public.middlewares=${ROUTER}-secure-headers,${ROUTER}-ratelimit-public
+      - traefik.http.routers.${ROUTER}-admin.rule=Host(`${VOUCHERS_HOST}`) && PathPrefix(`/admin`)
+      - traefik.http.routers.${ROUTER}-admin.entrypoints=websecure
+      - traefik.http.routers.${ROUTER}-admin.tls=true
+      - traefik.http.routers.${ROUTER}-admin.tls.certresolver=${CERT_RESOLVER}
+      - traefik.http.routers.${ROUTER}-admin.middlewares=${ROUTER}-secure-headers,${ROUTER}-ratelimit-admin
+      - traefik.http.services.${ROUTER}.loadbalancer.server.port=8080
+      - traefik.http.middlewares.${ROUTER}-secure-headers.headers.customResponseHeaders.X-Content-Type-Options=nosniff
+      - traefik.http.middlewares.${ROUTER}-secure-headers.headers.customResponseHeaders.X-Frame-Options=DENY
+      - traefik.http.middlewares.${ROUTER}-secure-headers.headers.customResponseHeaders.Content-Security-Policy=default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; form-action 'self'
+      - traefik.http.middlewares.${ROUTER}-secure-headers.headers.customResponseHeaders.Referrer-Policy=no-referrer
+      - traefik.http.middlewares.${ROUTER}-secure-headers.headers.stsSeconds=31536000
+      - traefik.http.middlewares.${ROUTER}-secure-headers.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.${ROUTER}-ratelimit-public.ratelimit.average=60
+      - traefik.http.middlewares.${ROUTER}-ratelimit-public.ratelimit.burst=120
+      - traefik.http.middlewares.${ROUTER}-ratelimit-admin.ratelimit.average=10
+      - traefik.http.middlewares.${ROUTER}-ratelimit-admin.ratelimit.burst=20
+    mem_limit: 256m
+    networks:
+      proxy: null
+    pids_limit: 100
+    read_only: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=50M,noexec,nosuid
+    user: 10001:10001
+    volumes:
+      - source: vouchers-data
+        target: /srv/vouchers
+        type: volume
+        volume: {}
+volumes:
+  vouchers-data:
+    external: true
+    name: vouchers-data

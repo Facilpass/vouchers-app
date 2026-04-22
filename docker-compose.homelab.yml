@@ -1,0 +1,7 @@
+services:
+  vouchers-app:
+    container_name: vouchers-facilpass-staging
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vouchers-app:staging
