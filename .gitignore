@@ -1,0 +1,27 @@
+# Binários
+/bin/
+/vouchers
+vouchers.exe
+
+# Env local
+.env
+!.env.example
+
+# Build artifacts
+*.webp.tmp
+/tmp/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+
+# Go test coverage
+coverage.out
+coverage.html
+
+# Docker local
+docker-compose.override.yml
