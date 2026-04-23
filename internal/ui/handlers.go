@@ -78,6 +78,8 @@ func (u *UI) PostLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "session sign", http.StatusInternalServerError)
 		return
 	}
+	// Apaga cookie legacy com Path=/admin (pode existir de deploys anteriores)
+	http.SetCookie(w, &http.Cookie{Name: u.o.CookieName, Value: "", Path: "/admin", MaxAge: -1})
 	http.SetCookie(w, &http.Cookie{
 		Name:     u.o.CookieName,
 		Value:    token,
@@ -107,12 +109,9 @@ func (u *UI) GetApp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *UI) GetLogout(w http.ResponseWriter, r *http.Request) {
-	http.SetCookie(w, &http.Cookie{
-		Name:   u.o.CookieName,
-		Value:  "",
-		Path:   "/",
-		MaxAge: -1,
-	})
+	// Apaga cookie em ambos paths pra cobrir versões legacy
+	http.SetCookie(w, &http.Cookie{Name: u.o.CookieName, Value: "", Path: "/", MaxAge: -1})
+	http.SetCookie(w, &http.Cookie{Name: u.o.CookieName, Value: "", Path: "/admin", MaxAge: -1})
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }
 
