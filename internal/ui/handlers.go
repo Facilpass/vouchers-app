@@ -39,7 +39,17 @@ func New(o UIOptions) *UI {
 	return &UI{o: o}
 }
 
+func noStore(w http.ResponseWriter) {
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, private")
+	w.Header().Set("Pragma", "no-cache")
+}
+
 func (u *UI) GetLogin(w http.ResponseWriter, r *http.Request) {
+	noStore(w)
+	if _, err := u.sessionUser(r); err == nil {
+		http.Redirect(w, r, "/admin/app", http.StatusSeeOther)
+		return
+	}
 	_ = u.o.Templates.Render(w, "login", map[string]any{
 		"Title": "Entrar",
 		"Error": r.URL.Query().Get("err"),
@@ -82,6 +92,7 @@ func (u *UI) PostLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *UI) GetApp(w http.ResponseWriter, r *http.Request) {
+	noStore(w)
 	user, err := u.sessionUser(r)
 	if err != nil {
 		http.Redirect(w, r, "/admin", http.StatusSeeOther)
@@ -107,12 +118,23 @@ func (u *UI) GetLogout(w http.ResponseWriter, r *http.Request) {
 
 func (u *UI) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if _, err := u.sessionUser(r); err != nil {
+		_, cookieErr := r.Cookie(u.o.CookieName)
+		_, err := u.sessionUser(r)
+		if err != nil {
+			u.o.Logger.Info("auth redirect", slog.String("path", r.URL.Path), slog.String("ip", clientIP(r)), slog.Bool("cookie_present", cookieErr == nil), slog.String("err", errString(err)))
+			noStore(w)
 			http.Redirect(w, r, "/admin", http.StatusSeeOther)
 			return
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+func errString(e error) string {
+	if e == nil {
+		return ""
+	}
+	return e.Error()
 }
 
 func (u *UI) CSRFCheckFromRequest(r *http.Request) func(string) bool {
