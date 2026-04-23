@@ -81,7 +81,7 @@ func (u *UI) PostLogin(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     u.o.CookieName,
 		Value:    token,
-		Path:     "/admin",
+		Path:     "/",
 		HttpOnly: true,
 		Secure:   u.o.CookieSecure,
 		SameSite: http.SameSiteLaxMode,
@@ -110,7 +110,7 @@ func (u *UI) GetLogout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:   u.o.CookieName,
 		Value:  "",
-		Path:   "/admin",
+		Path:   "/",
 		MaxAge: -1,
 	})
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
