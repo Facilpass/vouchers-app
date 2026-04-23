@@ -47,7 +47,7 @@ services:
       - traefik.http.services.${ROUTER}.loadbalancer.server.port=8080
       - traefik.http.middlewares.${ROUTER}-secure-headers.headers.customResponseHeaders.X-Content-Type-Options=nosniff
       - traefik.http.middlewares.${ROUTER}-secure-headers.headers.customResponseHeaders.X-Frame-Options=DENY
-      - traefik.http.middlewares.${ROUTER}-secure-headers.headers.customResponseHeaders.Content-Security-Policy=default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; form-action 'self'
+      - traefik.http.middlewares.${ROUTER}-secure-headers.headers.customResponseHeaders.Content-Security-Policy=default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' https://static.cloudflareinsights.com 'unsafe-inline'; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; frame-ancestors 'none'
       - traefik.http.middlewares.${ROUTER}-secure-headers.headers.customResponseHeaders.Referrer-Policy=no-referrer
       - traefik.http.middlewares.${ROUTER}-secure-headers.headers.stsSeconds=31536000
       - traefik.http.middlewares.${ROUTER}-secure-headers.headers.stsIncludeSubdomains=true
