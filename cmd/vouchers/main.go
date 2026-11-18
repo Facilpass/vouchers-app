@@ -100,10 +100,6 @@ func main() {
 		uploadHandler.WithCSRFCheck(uiHandler.CSRFCheckFromRequest(r)).ServeHTTP(w, r)
 	})))
 
-	// Raiz não tem conteúdo (CDN só serve arquivos) — manda pro site em vez de 404.
-	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "https://facilpass.com.br", http.StatusFound)
-	})
 	mux.Handle("GET /", serveHandler)
 
 	logger.Info("starting server", slog.String("addr", cfg.ListenAddr))
