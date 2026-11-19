@@ -100,6 +100,10 @@ func main() {
 		uploadHandler.WithCSRFCheck(uiHandler.CSRFCheckFromRequest(r)).ServeHTTP(w, r)
 	})))
 
+	// Raiz abre a ferramenta de upload (o resto do domínio só serve os .webp).
+	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/admin", http.StatusFound)
+	})
 	mux.Handle("GET /", serveHandler)
 
 	logger.Info("starting server", slog.String("addr", cfg.ListenAddr))
